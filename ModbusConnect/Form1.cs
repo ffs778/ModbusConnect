@@ -59,24 +59,17 @@ namespace ModbusConnect
         {
             try
             {
-                // 获得原始数据
-                byte slaveAddress = byte.Parse(slaveAddress_tbx.Text);
-                ushort startAddress = ushort.Parse(startAddress_tbx.Text);
-                ushort num = ushort.Parse(num_tbx.Text);
-                num = 2;
-                var data = modbusTCP.ReadHoldingRegisters(slaveAddress, startAddress, num);  // 站号， 数据起始地址,寄存器数量
-                   
+                var data = GetRegisterData();
                 // data 是ushort类型的数组，需要转byte数组，再转成相应的类型。
-                
                 // 类型转换后显示
                 switch (dataType_cbx.SelectedItem.ToString())
                 {
                     case "bool":
-                       boolValue_tbx.Text = MODBUS.GetBools(data, 0, num)[0].ToString(); // 读取到的底层数据，0位置开始，长度是一个字
+                        boolValue_tbx.Text = MODBUS.GetBools(data, 0, 1)[0].ToString(); // 读取到的底层数据，0位置开始，长度是一个字
                         break;
                     case "short": shortValue_tbx.Text = MODBUS.GetShort(data, 0).ToString(); break;
                     case "float": floatValue_tbx.Text = MODBUS.GetReal(data, 0).ToString(); break;
-                    case "string": stringValue_tbx.Text = MODBUS.GetString(data, 0, int.Parse(stringLen_tbx.Text)).ToString(); break;
+                    case "string": stringValue_tbx.Text = MODBUS.GetString(data, 0, int.Parse(stringLen_tbx.Text)); break;
                 }
                 return true;
             }
@@ -86,9 +79,36 @@ namespace ModbusConnect
                 return false;
             }
         }
+        private ushort[] GetRegisterData()
+        {
+            // 获得原始数据
+            byte slaveAddress = byte.Parse(slaveAddress_tbx.Text);
+            ushort startAddress = ushort.Parse(startAddress_tbx.Text);
+            ushort num = ushort.Parse(num_tbx.Text);
+            var data = modbusTCP.ReadHoldingRegisters(slaveAddress, startAddress, num);  // 站号， 数据起始地址,寄存器数量
+            return data;
+        }
+        /// <summary>
+        /// 向寄存器中写入数据
+        /// </summary>
+        /// <param name="data"></param>
+        private void WriteRegisterData(ushort[] data)
+        {
+            byte slaveAddress = byte.Parse(slaveAddress_tbx.Text);
+            ushort startAddress = ushort.Parse(startAddress_tbx.Text);
+            modbusTCP.WriteMultipleRegisters(slaveAddress, startAddress, data);
+        }
         private void WriteData_tbx_Click(object sender, EventArgs e)
         {
-            ///MODBUS.SetReal()
+            switch (dataType_cbx.SelectedItem.ToString())
+            {
+                case "string":
+                    ushort num = ushort.Parse(num_tbx.Text);
+                    ushort[] value = MODBUS.SetStrings(num, stringValue_tbx.Text);
+                    WriteRegisterData(value);
+                    break;
+            }
+
         }
     }
 }

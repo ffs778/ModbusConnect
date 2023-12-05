@@ -8,18 +8,20 @@ namespace ModbusConnect
 {
     public class MODBUS
     {
+        #region 读写string
         /// <summary>
         /// 赋值string
         /// </summary>
-        /// <param name="src"></param>
-        /// <param name="start"></param>
-        /// <param name="value"></param>
+        /// <param name="num">字符串变量总长度</param>
+        /// <param name="value">值</param>
         /// <returns></returns>
-        public static void SetString(ushort[] src, int start, string value)
+        public static ushort[] SetStrings(ushort num, string value)
         {
+            ushort[] datas = new ushort[num];
             byte[] bytesTemp = Encoding.UTF8.GetBytes(value);
-            ushort[] dest = Bytes2Ushorts(bytesTemp);
-            dest.CopyTo(src, start);
+            ushort[] dest = Bytes2Ushorts(bytesTemp, reverse: true);
+            dest.CopyTo(datas, 0);
+            return dest;
         }
 
         /// <summary>
@@ -31,16 +33,18 @@ namespace ModbusConnect
         /// <returns></returns>
         public static string GetString(ushort[] src, int start, int len)
         {
-            ushort[] temp = new ushort[len];
+            ushort[] temp = new ushort[len]; // w ; 中文、英文都占两个字节，数字占一个字节。这里len即为读取Word的数量。
             for (int i = 0; i < len; i++)
             {
                 temp[i] = src[i + start];
             }
-            byte[] bytesTemp = Ushorts2Bytes(temp);
+            byte[] bytesTemp = Ushorts2Bytes(temp, reverse: true);   // 需要倒转一下byte数组
             string res = Encoding.UTF8.GetString(bytesTemp).Trim(new char[] { '\0' });
             return res;
         }
+        #endregion
 
+        #region 读写Real
         /// <summary>
         /// 赋值Real类型数据
         /// </summary>
@@ -74,6 +78,9 @@ namespace ModbusConnect
             return res;
         }
 
+        #endregion
+
+        #region 读写short
         /// <summary>
         /// 赋值Short类型数据
         /// </summary>
@@ -103,7 +110,9 @@ namespace ModbusConnect
             short res = BitConverter.ToInt16(bytesTemp, 0);
             return res;
         }
+        #endregion
 
+        #region 读bool
 
         public static bool[] GetBools(ushort[] src, int start, int num)
         {
@@ -118,6 +127,9 @@ namespace ModbusConnect
 
             return res;
         }
+        #endregion
+
+        #region byte 和 bool互转
 
         private static bool[] Bytes2Bools(byte[] b)
         {
@@ -151,7 +163,9 @@ namespace ModbusConnect
             }
             return 0;
         }
+        #endregion
 
+        #region byte 和 ushort 互转
         private static ushort[] Bytes2Ushorts(byte[] src, bool reverse = false)
         {
             int len = src.Length;
@@ -183,8 +197,8 @@ namespace ModbusConnect
 
             return dest;
         }
-        
-        private static byte[] Ushorts2Bytes(ushort[] src, bool reverse = true)
+
+        private static byte[] Ushorts2Bytes(ushort[] src, bool reverse = false)
         {
 
             int count = src.Length;
@@ -207,6 +221,6 @@ namespace ModbusConnect
             }
             return dest;
         }
+        #endregion
     }
-
 }
