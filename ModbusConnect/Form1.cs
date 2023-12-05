@@ -1,0 +1,94 @@
+﻿using Modbus.Device;
+using Modbus.IO;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Drawing;
+using System.Linq;
+using System.Net.Sockets;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace ModbusConnect
+{
+    public partial class Form1 : Form
+    {
+        ModbusTCP modbusTCP;
+        public Form1()
+        {
+            InitializeComponent();
+            dataType_cbx.SelectedIndex = 0;
+        }
+        #region 连接
+
+        private void Connect_btn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                if (modbusTCP != null) modbusTCP.DisConnect();
+                modbusTCP = new ModbusTCP(ip_tbx.Text, int.Parse(port_tbx.Text));
+                string resultMsg = modbusTCP.Connected ? "连接成功！" : "连接失败";
+                MessageBox.Show(resultMsg);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"连接错误：{ex.Message}");
+            }
+        }
+        #endregion
+        private void GetData_tbx_Click(object sender, EventArgs e)
+        {
+            RefreshData();
+        }
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (modbusTCP != null && modbusTCP.Connected && autoRead_cbx.Checked)
+            {
+                if (!RefreshData())
+                    timer1.Tick -= timer1_Tick;
+            }
+        }
+        /// <summary>
+        /// 显示数据
+        /// </summary>
+        /// <param name="data"></param>
+        private bool RefreshData()
+        {
+            try
+            {
+                // 获得原始数据
+                byte slaveAddress = byte.Parse(slaveAddress_tbx.Text);
+                ushort startAddress = ushort.Parse(startAddress_tbx.Text);
+                ushort num = ushort.Parse(num_tbx.Text);
+                num = 2;
+                var data = modbusTCP.ReadHoldingRegisters(slaveAddress, startAddress, num);  // 站号， 数据起始地址,寄存器数量
+                   
+                // data 是ushort类型的数组，需要转byte数组，再转成相应的类型。
+                
+                // 类型转换后显示
+                switch (dataType_cbx.SelectedItem.ToString())
+                {
+                    case "bool":
+                       boolValue_tbx.Text = MODBUS.GetBools(data, 0, num)[0].ToString(); // 读取到的底层数据，0位置开始，长度是一个字
+                        break;
+                    case "short": shortValue_tbx.Text = MODBUS.GetShort(data, 0).ToString(); break;
+                    case "float": floatValue_tbx.Text = MODBUS.GetReal(data, 0).ToString(); break;
+                    case "string": stringValue_tbx.Text = MODBUS.GetString(data, 0, int.Parse(stringLen_tbx.Text)).ToString(); break;
+                }
+                return true;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("读取数据错误：" + ex.Message);
+                return false;
+            }
+        }
+        private void WriteData_tbx_Click(object sender, EventArgs e)
+        {
+            ///MODBUS.SetReal()
+        }
+    }
+}
