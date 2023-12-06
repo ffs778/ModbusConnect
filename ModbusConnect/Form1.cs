@@ -47,8 +47,7 @@ namespace ModbusConnect
         {
             if (modbusTCP != null && modbusTCP.Connected && autoRead_cbx.Checked)
             {
-                if (!RefreshData())
-                    timer1.Tick -= timer1_Tick;
+                RefreshData();
             }
         }
         /// <summary>
@@ -64,12 +63,10 @@ namespace ModbusConnect
                 // 类型转换后显示
                 switch (dataType_cbx.SelectedItem.ToString())
                 {
-                    case "bool":
-                        boolValue_tbx.Text = MODBUS.GetBools(data, 0, 1)[0].ToString(); // 读取到的底层数据，0位置开始，长度是一个字
-                        break;
+                    case "bool": boolValue_tbx.Text = string.Join(" ", MODBUS.GetBool(data)); break;
                     case "short": shortValue_tbx.Text = MODBUS.GetShort(data, 0).ToString(); break;
                     case "float": floatValue_tbx.Text = MODBUS.GetReal(data, 0).ToString(); break;
-                    case "string": stringValue_tbx.Text = MODBUS.GetString(data, 0, int.Parse(stringLen_tbx.Text)); break;
+                    case "string": stringValue_tbx.Text = MODBUS.GetWString(data); break;
                 }
                 return true;
             }
@@ -104,9 +101,13 @@ namespace ModbusConnect
             {
                 case "string":
                     ushort num = ushort.Parse(num_tbx.Text);
-                    ushort[] value = MODBUS.SetStrings(num, stringValue_tbx.Text);
-                    WriteRegisterData(value);
-                    break;
+                    WriteRegisterData(MODBUS.SetWString(num, stringValue_tbx.Text));break;
+                case "float":
+                    WriteRegisterData(MODBUS.SetReal(Convert.ToSingle(floatValue_tbx.Text)));break;
+                case "short":
+                    WriteRegisterData(MODBUS.SetShort(Convert.ToInt16(shortValue_tbx.Text)));break;
+                case "bool":
+                    WriteRegisterData(MODBUS.SetBool(Convert.ToBoolean(boolValue_tbx.Text)));break;
             }
 
         }

@@ -15,13 +15,13 @@ namespace ModbusConnect
         /// <param name="num">字符串变量总长度</param>
         /// <param name="value">值</param>
         /// <returns></returns>
-        public static ushort[] SetStrings(ushort num, string value)
+        public static ushort[] SetString(ushort num, string value)
         {
-            ushort[] datas = new ushort[num];
+            ushort[] fullData = new ushort[num];   // 定义指定长度，目的是通过覆盖，解决长字符串干扰短字符串的问题。
             byte[] bytesTemp = Encoding.UTF8.GetBytes(value);
-            ushort[] dest = Bytes2Ushorts(bytesTemp, reverse: true);
-            dest.CopyTo(datas, 0);
-            return dest;
+            ushort[] realData = Bytes2Ushorts(bytesTemp, reverse: false);
+            realData.CopyTo(fullData, 0);
+            return fullData;
         }
 
         /// <summary>
@@ -31,16 +31,38 @@ namespace ModbusConnect
         /// <param name="start"></param>
         /// <param name="len"></param>
         /// <returns></returns>
-        public static string GetString(ushort[] src, int start, int len)
+        public static string GetString(ushort[] src)
         {
-            ushort[] temp = new ushort[len]; // w ; 中文、英文都占两个字节，数字占一个字节。这里len即为读取Word的数量。
-            for (int i = 0; i < len; i++)
-            {
-                temp[i] = src[i + start];
-            }
-            byte[] bytesTemp = Ushorts2Bytes(temp, reverse: true);   // 需要倒转一下byte数组
+            byte[] bytesTemp = Ushorts2Bytes(src, reverse: false);
             string res = Encoding.UTF8.GetString(bytesTemp).Trim(new char[] { '\0' });
             return res;
+        }
+        /// <summary>
+        /// 获取PLC中wstring类型的数据，wstring可以包含中文字符
+        /// </summary>
+        /// <param name="src"></param>
+        /// <param name="start"></param>
+        /// <param name="len"></param>
+        /// <returns></returns>
+        public static string GetWString(ushort[] src)
+        {
+            byte[] bytesTemp = Ushorts2Bytes(src, reverse: true);
+            string res = Encoding.BigEndianUnicode.GetString(bytesTemp).Trim(new char[] { '\0' });
+            return res;
+        }
+        /// <summary>
+        /// 写如wstring类型。
+        /// </summary>
+        /// <param name="num"></param>
+        /// <param name="value"></param>
+        /// <returns></returns>
+        public static ushort[] SetWString(ushort num, string value)
+        {
+            ushort[] fullData = new ushort[num];
+            byte[] bytesTemp = Encoding.BigEndianUnicode.GetBytes(value);
+            ushort[] realData = Bytes2Ushorts(bytesTemp, reverse: true); // 存在byte数组顺序的问题导致乱序时，颠倒一下数组
+            realData.CopyTo(fullData, 0);
+            return fullData;
         }
         #endregion
 
@@ -51,14 +73,23 @@ namespace ModbusConnect
         /// <param name="src"></param>
         /// <param name="start"></param>
         /// <param name="value"></param>
-        public static void SetReal(ushort[] src, int start, float value)
+        public static ushort[] SetReal(float value)
         {
+
             byte[] bytes = BitConverter.GetBytes(value);
 
             ushort[] dest = Bytes2Ushorts(bytes);
 
-            dest.CopyTo(src, start);
+            return dest;
         }
+        //public static void SetReal(ushort[] src, int start, float value)
+        //{
+        //    byte[] bytes = BitConverter.GetBytes(value);
+
+        //    ushort[] dest = Bytes2Ushorts(bytes);
+
+        //    dest.CopyTo(src, start);
+        //}
 
         /// <summary>
         /// 获取float类型数据
@@ -87,14 +118,20 @@ namespace ModbusConnect
         /// <param name="src"></param>
         /// <param name="start"></param>
         /// <param name="value"></param>
-        public static void SetShort(ushort[] src, int start, short value)
+        public static ushort[] SetShort(short value)
         {
             byte[] bytes = BitConverter.GetBytes(value);
-
             ushort[] dest = Bytes2Ushorts(bytes);
-
-            dest.CopyTo(src, start);
+            return dest;
         }
+        //public static void SetShort(ushort[] src, int start, short value)
+        //{
+        //    byte[] bytes = BitConverter.GetBytes(value);
+
+        //    ushort[] dest = Bytes2Ushorts(bytes);
+
+        //    dest.CopyTo(src, start);
+        //}
 
         /// <summary>
         /// 获取short类型数据
@@ -112,24 +149,52 @@ namespace ModbusConnect
         }
         #endregion
 
-        #region 读bool
+        #region 读写bool
 
-        public static bool[] GetBools(ushort[] src, int start, int num)
+        public static ushort[] SetBool(bool value)
         {
-            ushort[] temp = new ushort[num];
-            for (int i = start; i < start + num; i++)
-            {
-                temp[i] = src[i + start];
-            }
-            byte[] bytes = Ushorts2Bytes(temp);
-
-            bool[] res = Bytes2Bools(bytes);
-
-            return res;
+            byte[] bytes = BitConverter.GetBytes(value);
+            ushort[] dest = Bytes2Ushorts(bytes);
+            return dest;
         }
+
+        // ushort类型数据，16位 ， bool 类型8位   ， 地址中输入1
+        public static bool[] GetBool(ushort[] src)
+        {
+            byte[] bytes = Ushorts2Bytes(src);  // 从16位到8位，后8位的数据是无效的。
+            List<bool> data = new List<bool>(src.Length);
+            bool[] res = Byte2Bool(bytes);
+            for (int i = 0; i < src.Length; i++)
+            {
+                if (i%2 == 0) data.Add(res[i]);
+            }
+            return data.ToArray();
+        }
+        //public static bool[] GetBools(ushort[] src, int start, int num)
+        //{
+        //    ushort[] temp = new ushort[num];
+        //    for (int i = start; i < start + num; i++)
+        //    {
+        //        temp[i] = src[i + start];
+        //    }
+        //    byte[] bytes = Ushorts2Bytes(temp);
+
+        //    bool[] res = Bytes2Bools(bytes);
+
+        //    return res;
+        //}
         #endregion
 
         #region byte 和 bool互转
+        private static bool[] Byte2Bool(byte[] b)
+        {
+            bool[] array = new bool[b.Length];
+            for (int i = 0; i < b.Length; i++)
+            {
+                array[i] = BitConverter.ToBoolean(b, i);
+            }
+            return array;
+        }
 
         private static bool[] Bytes2Bools(byte[] b)
         {
