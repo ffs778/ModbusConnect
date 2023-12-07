@@ -95,6 +95,17 @@ namespace ModbusConnect
         /// 获取float类型数据
         /// </summary>
         /// <param name="src"></param>
+        /// <returns></returns>
+        public static float GetReal(ushort[] src)
+        {
+            byte[] bytesTemp = Ushorts2Bytes(src);
+            float res = BitConverter.ToSingle(bytesTemp, 0);
+            return res;
+        }
+        /// <summary>
+        /// 获取float类型数据
+        /// </summary>
+        /// <param name="src"></param>
         /// <param name="start"></param>
         /// <returns></returns>
         public static float GetReal(ushort[] src, int start)
@@ -139,6 +150,12 @@ namespace ModbusConnect
         /// <param name="src"></param>
         /// <param name="start"></param>
         /// <returns></returns>
+        public static short GetShort(ushort[] src)
+        {
+            byte[] bytesTemp = Ushorts2Bytes(src);
+            short res = BitConverter.ToInt16(bytesTemp, 0);
+            return res;
+        }
         public static short GetShort(ushort[] src, int start)
         {
             ushort[] temp = new ushort[1];
@@ -159,7 +176,7 @@ namespace ModbusConnect
         }
 
         // ushort类型数据，16位 ， bool 类型8位   ， 地址中输入1
-        public static bool[] GetBool(ushort[] src)
+        public static bool GetBool(ushort[] src)
         {
             byte[] bytes = Ushorts2Bytes(src);  // 从16位到8位，后8位的数据是无效的。
             List<bool> data = new List<bool>(src.Length);
@@ -168,7 +185,7 @@ namespace ModbusConnect
             {
                 if (i%2 == 0) data.Add(res[i]);
             }
-            return data.ToArray();
+            return data.ToArray()[0];
         }
         //public static bool[] GetBools(ushort[] src, int start, int num)
         //{
