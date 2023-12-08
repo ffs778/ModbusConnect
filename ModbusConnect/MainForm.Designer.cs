@@ -29,6 +29,7 @@ namespace ModbusConnect
         /// </summary>
         private void InitializeComponent()
         {
+            this.components = new System.ComponentModel.Container();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle7 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle8 = new System.Windows.Forms.DataGridViewCellStyle();
             System.Windows.Forms.DataGridViewCellStyle dataGridViewCellStyle9 = new System.Windows.Forms.DataGridViewCellStyle();
@@ -37,7 +38,7 @@ namespace ModbusConnect
             this.groupBox1 = new System.Windows.Forms.GroupBox();
             this.toolStrip1 = new System.Windows.Forms.ToolStrip();
             this.toolStripLabel1 = new System.Windows.Forms.ToolStripLabel();
-            this.ip_tbx = new System.Windows.Forms.ToolStripTextBox();
+            this.ip_cbx = new System.Windows.Forms.ToolStripComboBox();
             this.toolStripSeparator1 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel2 = new System.Windows.Forms.ToolStripLabel();
             this.port_tbx = new System.Windows.Forms.ToolStripTextBox();
@@ -54,6 +55,7 @@ namespace ModbusConnect
             this.read_btn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
             this.wirte_btn = new System.Windows.Forms.ToolStripButton();
+            this.timer1 = new System.Windows.Forms.Timer(this.components);
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.groupBox1.SuspendLayout();
             this.toolStrip1.SuspendLayout();
@@ -82,11 +84,13 @@ namespace ModbusConnect
             dataGridViewCellStyle9.WrapMode = System.Windows.Forms.DataGridViewTriState.False;
             this.dataGridView1.DefaultCellStyle = dataGridViewCellStyle9;
             this.dataGridView1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.dataGridView1.Location = new System.Drawing.Point(3, 19);
+            this.dataGridView1.Location = new System.Drawing.Point(4, 24);
+            this.dataGridView1.Margin = new System.Windows.Forms.Padding(4);
             this.dataGridView1.Name = "dataGridView1";
             this.dataGridView1.RowHeadersVisible = false;
+            this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 25;
-            this.dataGridView1.Size = new System.Drawing.Size(1178, 630);
+            this.dataGridView1.Size = new System.Drawing.Size(1514, 739);
             this.dataGridView1.TabIndex = 26;
             // 
             // groupBox1
@@ -94,8 +98,10 @@ namespace ModbusConnect
             this.groupBox1.Controls.Add(this.dataGridView1);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
+            this.groupBox1.Margin = new System.Windows.Forms.Padding(4);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(1184, 652);
+            this.groupBox1.Padding = new System.Windows.Forms.Padding(4);
+            this.groupBox1.Size = new System.Drawing.Size(1522, 767);
             this.groupBox1.TabIndex = 27;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "模拟变量表";
@@ -104,9 +110,10 @@ namespace ModbusConnect
             // 
             this.toolStrip1.Dock = System.Windows.Forms.DockStyle.Bottom;
             this.toolStrip1.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.toolStrip1.ImageScalingSize = new System.Drawing.Size(20, 20);
             this.toolStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.toolStripLabel1,
-            this.ip_tbx,
+            this.ip_cbx,
             this.toolStripSeparator1,
             this.toolStripLabel2,
             this.port_tbx,
@@ -123,36 +130,38 @@ namespace ModbusConnect
             this.read_btn,
             this.toolStripSeparator5,
             this.wirte_btn});
-            this.toolStrip1.Location = new System.Drawing.Point(0, 625);
+            this.toolStrip1.Location = new System.Drawing.Point(0, 735);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1184, 27);
+            this.toolStrip1.Size = new System.Drawing.Size(1522, 32);
             this.toolStrip1.TabIndex = 28;
             this.toolStrip1.Text = "toolStrip1";
             // 
             // toolStripLabel1
             // 
             this.toolStripLabel1.Name = "toolStripLabel1";
-            this.toolStripLabel1.Size = new System.Drawing.Size(36, 24);
+            this.toolStripLabel1.Size = new System.Drawing.Size(44, 29);
             this.toolStripLabel1.Text = "IP：";
             // 
-            // ip_tbx
+            // ip_cbx
             // 
-            this.ip_tbx.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
-            this.ip_tbx.ForeColor = System.Drawing.SystemColors.MenuHighlight;
-            this.ip_tbx.Name = "ip_tbx";
-            this.ip_tbx.Size = new System.Drawing.Size(100, 27);
-            this.ip_tbx.Text = "127.0.0.1";
-            this.ip_tbx.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
+            this.ip_cbx.DropDownStyle = System.Windows.Forms.ComboBoxStyle.DropDownList;
+            this.ip_cbx.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.8F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.ip_cbx.ForeColor = System.Drawing.SystemColors.MenuHighlight;
+            this.ip_cbx.Items.AddRange(new object[] {
+            "127.0.0.1",
+            "192.168.1.88"});
+            this.ip_cbx.Name = "ip_cbx";
+            this.ip_cbx.Size = new System.Drawing.Size(160, 32);
             // 
             // toolStripSeparator1
             // 
             this.toolStripSeparator1.Name = "toolStripSeparator1";
-            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator1.Size = new System.Drawing.Size(6, 32);
             // 
             // toolStripLabel2
             // 
             this.toolStripLabel2.Name = "toolStripLabel2";
-            this.toolStripLabel2.Size = new System.Drawing.Size(51, 24);
+            this.toolStripLabel2.Size = new System.Drawing.Size(64, 29);
             this.toolStripLabel2.Text = "Port：";
             // 
             // port_tbx
@@ -160,19 +169,19 @@ namespace ModbusConnect
             this.port_tbx.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.port_tbx.ForeColor = System.Drawing.SystemColors.MenuHighlight;
             this.port_tbx.Name = "port_tbx";
-            this.port_tbx.Size = new System.Drawing.Size(50, 27);
+            this.port_tbx.Size = new System.Drawing.Size(63, 32);
             this.port_tbx.Text = "502";
             this.port_tbx.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // toolStripSeparator2
             // 
             this.toolStripSeparator2.Name = "toolStripSeparator2";
-            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator2.Size = new System.Drawing.Size(6, 32);
             // 
             // toolStripLabel3
             // 
             this.toolStripLabel3.Name = "toolStripLabel3";
-            this.toolStripLabel3.Size = new System.Drawing.Size(65, 24);
+            this.toolStripLabel3.Size = new System.Drawing.Size(82, 29);
             this.toolStripLabel3.Text = "从站号：";
             // 
             // slaveAddress_tbx
@@ -180,21 +189,21 @@ namespace ModbusConnect
             this.slaveAddress_tbx.Font = new System.Drawing.Font("Microsoft YaHei UI", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.slaveAddress_tbx.ForeColor = System.Drawing.SystemColors.MenuHighlight;
             this.slaveAddress_tbx.Name = "slaveAddress_tbx";
-            this.slaveAddress_tbx.Size = new System.Drawing.Size(50, 27);
+            this.slaveAddress_tbx.Size = new System.Drawing.Size(63, 32);
             this.slaveAddress_tbx.Text = "1";
             this.slaveAddress_tbx.TextBoxTextAlign = System.Windows.Forms.HorizontalAlignment.Center;
             // 
             // toolStripSeparator3
             // 
             this.toolStripSeparator3.Name = "toolStripSeparator3";
-            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator3.Size = new System.Drawing.Size(6, 32);
             // 
             // connect_btn
             // 
             this.connect_btn.AutoSize = false;
             this.connect_btn.BackColor = System.Drawing.Color.DarkGreen;
             this.connect_btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.connect_btn.Font = new System.Drawing.Font("华文中宋", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
+            this.connect_btn.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.5F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point);
             this.connect_btn.ForeColor = System.Drawing.SystemColors.ControlLightLight;
             this.connect_btn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.connect_btn.Name = "connect_btn";
@@ -211,20 +220,20 @@ namespace ModbusConnect
             // toolStripLabel4
             // 
             this.toolStripLabel4.Name = "toolStripLabel4";
-            this.toolStripLabel4.Size = new System.Drawing.Size(79, 24);
+            this.toolStripLabel4.Size = new System.Drawing.Size(100, 29);
             this.toolStripLabel4.Text = "连接状态：";
             // 
             // connectState_lab
             // 
             this.connectState_lab.ForeColor = System.Drawing.SystemColors.ControlDark;
             this.connectState_lab.Name = "connectState_lab";
-            this.connectState_lab.Size = new System.Drawing.Size(51, 24);
+            this.connectState_lab.Size = new System.Drawing.Size(64, 29);
             this.connectState_lab.Text = "未连接";
             // 
             // toolStripSeparator4
             // 
             this.toolStripSeparator4.Name = "toolStripSeparator4";
-            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator4.Size = new System.Drawing.Size(6, 32);
             // 
             // toolStripLabel5
             // 
@@ -240,14 +249,14 @@ namespace ModbusConnect
             this.read_btn.Image = ((System.Drawing.Image)(resources.GetObject("read_btn.Image")));
             this.read_btn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.read_btn.Name = "read_btn";
-            this.read_btn.Size = new System.Drawing.Size(69, 24);
+            this.read_btn.Size = new System.Drawing.Size(86, 29);
             this.read_btn.Text = "数据读取";
             this.read_btn.Click += new System.EventHandler(this.GetData_tbx_Click);
             // 
             // toolStripSeparator5
             // 
             this.toolStripSeparator5.Name = "toolStripSeparator5";
-            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 27);
+            this.toolStripSeparator5.Size = new System.Drawing.Size(6, 32);
             // 
             // wirte_btn
             // 
@@ -257,17 +266,23 @@ namespace ModbusConnect
             this.wirte_btn.Image = ((System.Drawing.Image)(resources.GetObject("wirte_btn.Image")));
             this.wirte_btn.ImageTransparentColor = System.Drawing.Color.Magenta;
             this.wirte_btn.Name = "wirte_btn";
-            this.wirte_btn.Size = new System.Drawing.Size(69, 24);
+            this.wirte_btn.Size = new System.Drawing.Size(86, 29);
             this.wirte_btn.Text = "数据写入";
             this.wirte_btn.Click += new System.EventHandler(this.Wirte_btn_Click);
             // 
+            // timer1
+            // 
+            this.timer1.Enabled = true;
+            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            // 
             // MainForm
             // 
-            this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
+            this.AutoScaleDimensions = new System.Drawing.SizeF(9F, 20F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1184, 652);
+            this.ClientSize = new System.Drawing.Size(1522, 767);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.groupBox1);
+            this.Margin = new System.Windows.Forms.Padding(4);
             this.Name = "MainForm";
             this.Text = "ModbusTCPTool";
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).EndInit();
@@ -284,7 +299,6 @@ namespace ModbusConnect
         private System.Windows.Forms.GroupBox groupBox1;
         private System.Windows.Forms.ToolStrip toolStrip1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel1;
-        private System.Windows.Forms.ToolStripTextBox ip_tbx;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator1;
         private System.Windows.Forms.ToolStripLabel toolStripLabel2;
         private System.Windows.Forms.ToolStripTextBox port_tbx;
@@ -301,6 +315,8 @@ namespace ModbusConnect
         private System.Windows.Forms.ToolStripButton read_btn;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator5;
         private System.Windows.Forms.ToolStripButton wirte_btn;
+        private System.Windows.Forms.ToolStripComboBox ip_cbx;
+        private System.Windows.Forms.Timer timer1;
     }
 }
 

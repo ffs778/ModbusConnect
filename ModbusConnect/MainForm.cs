@@ -21,6 +21,7 @@ namespace ModbusConnect
         {
             InitializeComponent();
             CreateDataTable();
+            ip_cbx.SelectedIndex = 0;
         }
         #region 初始化数据表
 
@@ -30,10 +31,10 @@ namespace ModbusConnect
         private void CreateDataTable()
         {
             string[] headers = { "变量名", "数据类型", "起始地址", "数据长度", "当前值" };
-            string[] varName = { "boolVar", "shortVar", "floatVar", "stringVar", "wstringVar" };
-            string[] varDataType = { "bool", "short", "float", "string", "wstring" };
-            string[] startAddress = { "0", "0", "0", "0", "0" };
-            string[] length = { "1", "1", "2", "10", "10" };
+            string[] varName = { "boolVar", "shortVar", "floatVar", "stringVar", "wstringVar", "shortVar2" };
+            string[] varDataType = { "bool", "short", "float", "string", "wstring", "short" };
+            string[] startAddress = { "300", "301", "302", "304", "0", "0" };
+            string[] length = { "1", "1", "2", "10", "10", "" };
 
             DataTable dt = new();
             for (int i = 0; i < headers.Length; i++)
@@ -57,7 +58,7 @@ namespace ModbusConnect
                 dt.Rows.Add(dr);
             }
             dataGridView1.DataSource = dt;
-        } 
+        }
         #endregion
 
         #region 连接
@@ -67,17 +68,8 @@ namespace ModbusConnect
             try
             {
                 if (_modbusTCP != null) _modbusTCP.DisConnect();
-                _modbusTCP = new ModbusTCPHelper(ip_tbx.Text, int.Parse(port_tbx.Text));
-                if (_modbusTCP.IsConnected)
-                {
-                    connectState_lab.Text = "已连接";
-                    connectState_lab.ForeColor = Color.Green;
-                }
-                else
-                {
-                    connectState_lab.Text = "未连接";
-                    connectState_lab.ForeColor = Color.DarkGray;
-                }
+                _modbusTCP = new ModbusTCPHelper(ip_cbx.Text, int.Parse(port_tbx.Text));
+
             }
             catch (Exception ex)
             {
@@ -130,9 +122,9 @@ namespace ModbusConnect
                     Length = dt.Rows[i][3].ToString(),
                     Value = dt.Rows[i][4].ToString()
                 };
-                _modbusTCP.WriteData(model, GetDataByType(model.DataType, model.Value)) ;
+                _modbusTCP.WriteData(model, GetDataByType(model.DataType, model.Value));
             }
-        } 
+        }
         private dynamic GetDataByType(string dataType, string value)
         {
             switch (dataType)
@@ -146,5 +138,20 @@ namespace ModbusConnect
             }
         }
         #endregion
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            if (_modbusTCP == null) return;
+            if (_modbusTCP.IsConnected)
+            {
+                connectState_lab.Text = "已连接";
+                connectState_lab.ForeColor = Color.Green;
+            }
+            else
+            {
+                connectState_lab.Text = "未连接";
+                connectState_lab.ForeColor = Color.DarkGray;
+            }
+        }
     }
 }
