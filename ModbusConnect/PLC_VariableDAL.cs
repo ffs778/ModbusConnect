@@ -9,7 +9,7 @@ namespace PLCConnect
 {
     public class PLC_VariableDAL
     {
-        public DataTable GetData()
+        public static DataTable GetData()
         {
             string commandText = $"select * from PLC_Variable;";
             return DBHelper.Instance.CheckSQL(commandText);

@@ -15,16 +15,120 @@ namespace PLCConnect
 {
     public partial class MainForm : Form
     {
+        DataTable dt;
         PLC _plc;
         Dictionary<string, VariableModel> _varDic = new();
         public MainForm()
         {
             InitializeComponent();
             plcType_cbx.SelectedIndex = 1;
-           
-            CreateDataTable();
             ip_cbx.SelectedIndex = 0;
+
+            dt = PLC_VariableDAL.GetData();
+            dataGridView1.DataSource = dt;
         }
+        #region 连接
+
+        private void Connect_btn_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                PLCFactory pLCFactory = new PLCFactory(dt);
+                switch (plcType_cbx.Text)
+                {
+                    case "Beckhoff":
+                        _plc = pLCFactory.ConnectBeckhoffPLC(ip_cbx.Text, int.Parse(port_tbx.Text)); break;
+                    case "Inovance":
+                        _plc = pLCFactory.ConnectInovance(ip_cbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text));
+                        break;
+                       
+                    default:throw new Exception("plc类型出现错误！");
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"连接错误：{ex.Message}");
+            }
+        }
+        #endregion
+
+        #region 读
+        private void GetData_tbx_Click(object sender, EventArgs e)
+        {
+            if (_plc == null || !_plc.IsConnected) return;
+            // 跟据每一行变量的地址信息，从PLC中读取后写入到value列
+            DataTable dt = dataGridView1.DataSource as DataTable;
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                SiteTypeVarModel model = new SiteTypeVarModel()
+                {
+                    VariableName = dt.Rows[i]["VariableName"].ToString(),
+                    DataType = dt.Rows[i]["DataType"].ToString(),
+                    StartAddress = dt.Rows[i]["StartAddress"].ToString(),
+                    Length = dt.Rows[i]["Length"].ToString(),
+                };
+                _varDic[model.VariableName] = model;
+            }
+            var keys = _varDic.Keys.ToArray();
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                dt.Rows[i]["Value"] = _plc.Read(_varDic[keys[i]]);
+            }
+            dataGridView1.DataSource = dt;
+        }
+        #endregion
+
+        #region 写
+
+        private void Wirte_btn_Click(object sender, EventArgs e)
+        {
+            if (_plc == null || !_plc.IsConnected) return;
+            // 根据每个变量的信息，将value列的值写入到PLC中。
+            DataTable dt = dataGridView1.DataSource as DataTable;
+            for (int i = 0; i < dt.Rows.Count; i++)
+            {
+                SiteTypeVarModel model = new SiteTypeVarModel()
+                {
+                    VariableName = dt.Rows[i]["VariableName"].ToString(),
+                    DataType = dt.Rows[i]["DataType"].ToString(),
+                    StartAddress = dt.Rows[i]["StartAddress"].ToString(),
+                    Length = dt.Rows[i]["Length"].ToString(),
+                    Value = dt.Rows[i]["Value"].ToString()
+                };
+                _plc.Write(model, GetDataByType(model.DataType, model.Value));
+            }
+        }
+        private dynamic GetDataByType(string dataType, string value)
+        {
+            switch (dataType)
+            {
+                case "bool": return Convert.ToBoolean(value);
+                case "short": return Convert.ToInt16(value);
+                case "float": return Convert.ToSingle(value);
+                case "string": return value;
+                case "wstring": return value;
+                default: return null;
+            }
+        }
+        #endregion
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            // 始终判断PLC连接状态
+            if (_plc == null) return;
+            if (_plc.IsConnected)
+            {
+                connectState_lab.Text = "已连接";
+                connectState_lab.ForeColor = Color.Green;
+            }
+            else
+            {
+                connectState_lab.Text = "未连接";
+                connectState_lab.ForeColor = Color.DarkGray;
+            }
+        }
+
+
         #region 初始化数据表
 
         /// <summary>
@@ -63,102 +167,20 @@ namespace PLCConnect
         }
         #endregion
 
-        #region 连接
-
-        private void Connect_btn_Click(object sender, EventArgs e)
+        private void plcHeartShield_btn_Click(object sender, EventArgs e)
         {
-            try
-            {
-                switch (plcType_cbx.Text)
-                {
-                    case "Beckhoff":
-                        _plc = PLCFactory.ConnectBeckhoffPLC(ip_cbx.Text, int.Parse(port_tbx.Text)); break;
-                    case "Inovance":
-                        _plc = PLCFactory.ConnectInovance(ip_cbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text)); break;
-                    default:throw new Exception("plc类型出现错误！");
-                }
-            }
-            catch (Exception ex)
-            {
-                MessageBox.Show($"连接错误：{ex.Message}");
-            }
-        }
-        #endregion
-
-        #region 读
-        private void GetData_tbx_Click(object sender, EventArgs e)
-        {
-            if (_plc == null || !_plc.IsConnected) return;
-            // 跟据每一行变量的地址信息，从PLC中读取后写入到value列
-            DataTable dt = dataGridView1.DataSource as DataTable;
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                SiteTypeVarModel model = new SiteTypeVarModel()
-                {
-                    VariableName = dt.Rows[i][0].ToString(),
-                    DataType = dt.Rows[i][1].ToString(),
-                    StartAddress = dt.Rows[i][2].ToString(),
-                    Length = dt.Rows[i][3].ToString(),
-                };
-                _varDic[model.VariableName] = model;
-            }
-            var keys = _varDic.Keys.ToArray();
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                dt.Rows[i][4] = _plc.Read(_varDic[keys[i]]);
-            }
-            dataGridView1.DataSource = dt;
-        }
-        #endregion
-
-        #region 写
-
-        private void Wirte_btn_Click(object sender, EventArgs e)
-        {
-            if (_plc == null || !_plc.IsConnected) return;
-            // 根据每个变量的信息，将value列的值写入到PLC中。
-            DataTable dt = dataGridView1.DataSource as DataTable;
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                SiteTypeVarModel model = new SiteTypeVarModel()
-                {
-                    VariableName = dt.Rows[i][0].ToString(),
-                    DataType = dt.Rows[i][1].ToString(),
-                    StartAddress = dt.Rows[i][2].ToString(),
-                    Length = dt.Rows[i][3].ToString(),
-                    Value = dt.Rows[i][4].ToString()
-                };
-                _plc.Write(model, GetDataByType(model.DataType, model.Value));
-            }
-        }
-        private dynamic GetDataByType(string dataType, string value)
-        {
-            switch (dataType)
-            {
-                case "bool": return Convert.ToBoolean(value);
-                case "short": return Convert.ToInt16(value);
-                case "float": return Convert.ToSingle(value);
-                case "string": return value;
-                case "wstring": return value;
-                default: return null;
-            }
-        }
-        #endregion
-
-        private void timer1_Tick(object sender, EventArgs e)
-        {
-            // 始终判断PLC连接状态
             if (_plc == null) return;
-            if (_plc.IsConnected)
+            if (plcHeartShield_btn.Text == "屏蔽PLC心跳")
             {
-                connectState_lab.Text = "已连接";
-                connectState_lab.ForeColor = Color.Green;
+                _plc.IsShieldPLCHeart = true;
+                plcHeartShield_btn.Text = "取消PLC心跳屏蔽";
             }
             else
             {
-                connectState_lab.Text = "未连接";
-                connectState_lab.ForeColor = Color.DarkGray;
+                _plc.IsShieldPLCHeart = false;
+                plcHeartShield_btn.Text = "屏蔽PLC心跳";
             }
+            
         }
     }
 }

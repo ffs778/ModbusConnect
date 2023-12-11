@@ -1,6 +1,7 @@
 ﻿using NModbus;
 using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Net.Sockets;
 using System.Text;
@@ -9,7 +10,7 @@ using System.Threading.Tasks;
 
 namespace PLCConnect
 {
-    public class ModbusTCPHelper: PLC
+    public class ModbusTCPHelper : PLC
     {
         #region 私有字段
         private ModbusFactory _modbusFactory;
@@ -22,7 +23,7 @@ namespace PLCConnect
         #endregion
 
         #region 公开属性
-   
+
         public byte SlaveAddress { get; set; }
         #endregion
 
@@ -33,8 +34,6 @@ namespace PLCConnect
             SlaveAddress = slaveAddress;
             Connect();
             OnDisConnecting += ModbusTCPHelper_OnDisConnecting;
-            Task.Factory.StartNew(() => { MonitorPLCHeart(); }, TaskCreationOptions.LongRunning);
-            Task.Factory.StartNew(() => { SendPCHeart(); }, TaskCreationOptions.LongRunning);
         }
         public override void Connect()
         {
@@ -47,6 +46,7 @@ namespace PLCConnect
                 _master.Transport.WriteTimeout = 1000;    // 写数据超时时间
                 _master.Transport.Retries = 10;
                 _master.Transport.WaitToRetryMilliseconds = 2500;
+                IsConnected = true; // temp
             }
             catch (Exception ex)
             {
@@ -64,55 +64,78 @@ namespace PLCConnect
             Connect();
         }
 
+        #region 心跳收发
+
         /// <summary>
         /// 监控PLC心跳
         /// </summary>
-        protected void MonitorPLCHeart()
+        public override void MonitorPLCHeart()
         {
-            List<bool> heartLst = new();
-            while (true)
+            Task.Factory.StartNew(() =>
             {
-                if (!IsShieldPLCHeart) // 心跳屏蔽状态
+                try
                 {
-                    // 监控PLC心跳，如果脉冲长时间不变化，则说明断线
-                    if (heartLst.Count <= 5)
+                    List<bool> heartLst = new();
+                    while (true)
                     {
-                        heartLst.Add(DataDic["PLCHeart"].Value);
-                    }
-                    else
-                    {
-                        if (heartLst.Distinct().Count() == 1)
+                        if (!IsShieldPLCHeart) // 心跳屏蔽状态
                         {
-                            // list中只有一种bool类型，即心跳断开
-                            IsConnected = false;
-                            OnDisConnecting.Invoke(true, EventArgs.Empty);   // 表示捕捉到ads通讯未连接，执行事件
+                            // 监控PLC心跳，如果脉冲长时间不变化，则说明断线
+                            if (heartLst.Count <= 5)
+                            {
+                                heartLst.Add(DataDic["PLCHeart"].Value);
+                            }
+                            else
+                            {
+                                if (heartLst.Distinct().Count() == 1)
+                                {
+                                    // list中只有一种bool类型，即心跳断开
+                                    IsConnected = false;
+                                    //  OnDisConnecting.Invoke(true, EventArgs.Empty);   // 表示捕捉到ads通讯未连接，执行事件
+                                }
+                                else
+                                {
+                                    IsConnected = true;
+                                }
+                                heartLst.Clear();
+                            }
                         }
                         else
                         {
-                            IsConnected = true;
+                            IsConnected = true;    // 屏蔽心跳，强制为已连接状态。
                         }
-                        heartLst.Clear();
+                        Thread.Sleep(300);
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    IsConnected = true;    // 屏蔽心跳，强制为已连接状态。
+                    System.Windows.Forms.MessageBox.Show("心跳监控出现错误:" + ex.Message);
                 }
-                Thread.Sleep(300);
-            }
+            }, TaskCreationOptions.LongRunning);
         }
         /// <summary>
         /// 发送PC心跳
         /// </summary>
-        protected void SendPCHeart()
+        public override void SendPCHeart()
         {
             bool heart = false;
-            while (true)
+            Task.Factory.StartNew(() =>
             {
-                Write(DataDic["PCHeart"], !heart);
-                Thread.Sleep(1000);
-            }
+                try
+                {
+                    while (true)
+                    {
+                        Write(DataDic["PCHeart"], !heart);
+                        Thread.Sleep(1000);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    System.Windows.Forms.MessageBox.Show("心跳写入出现错误！" + ex.Message);
+                }
+            }, TaskCreationOptions.LongRunning);
         }
+        #endregion
 
         #region 读写变量
 
@@ -160,6 +183,22 @@ namespace PLCConnect
                 default: return null;
             }
         }
+
         #endregion
+
+        public override void DataTableToDic(DataTable dbDataTable)
+        {
+            for (int i = 0; i < dbDataTable.Rows.Count; i++)
+            {
+                SiteTypeVarModel model = new SiteTypeVarModel()
+                {
+                    VariableName = dbDataTable.Rows[i]["VariableName"].ToString(),
+                    DataType = dbDataTable.Rows[i]["DataType"].ToString(),
+                    StartAddress = dbDataTable.Rows[i]["StartAddress"].ToString(),
+                    Length = dbDataTable.Rows[i]["Length"].ToString(),
+                };
+                DataDic[model.VariableName] = model;
+            }
+        }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,7 +22,7 @@ namespace PLCConnect
         /// 是否屏蔽PLC
         /// </summary>
         public bool IsShieldPLCHeart { get; set; }
-        public Dictionary<string, dynamic> DataDic { get; set; }
+        public Dictionary<string, dynamic> DataDic { get; set; } = new();
         #endregion
         /// <summary>
         /// PLC连接
@@ -43,6 +44,8 @@ namespace PLCConnect
         /// <param name="model"></param>
         /// <returns></returns>
         public abstract dynamic Read(VariableModel model);
-
+        public abstract void MonitorPLCHeart();
+        public abstract void SendPCHeart();
+        public abstract void DataTableToDic(DataTable dbDataTable);
     }
 }
