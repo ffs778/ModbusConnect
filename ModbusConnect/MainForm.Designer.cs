@@ -1,5 +1,5 @@
 ﻿
-namespace ModbusConnect
+namespace PLCConnect
 {
     partial class MainForm
     {

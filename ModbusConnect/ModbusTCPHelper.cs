@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace ModbusConnect
+namespace PLCConnect
 {
     public class ModbusTCPHelper: PLC
     {

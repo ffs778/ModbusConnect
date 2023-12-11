@@ -6,7 +6,7 @@ using System.Diagnostics;
 using System.IO;
 using System.Windows.Forms;
 
-namespace HACDAL
+namespace PLCConnect
 {
     public class DBHelper
     {

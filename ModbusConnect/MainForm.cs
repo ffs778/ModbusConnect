@@ -11,7 +11,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 
-namespace ModbusConnect
+namespace PLCConnect
 {
     public partial class MainForm : Form
     {
