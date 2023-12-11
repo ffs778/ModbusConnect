@@ -23,6 +23,7 @@ namespace ModbusConnect
             plcType_cbx.SelectedIndex = 1;
            
             CreateDataTable();
+            ip_cbx.SelectedIndex = 0;
         }
         #region 初始化数据表
 
@@ -32,10 +33,10 @@ namespace ModbusConnect
         private void CreateDataTable()
         {
             string[] headers = { "变量名", "数据类型", "起始地址", "数据长度", "当前值" };
-            string[] varName = { "boolVar", "shortVar", "floatVar", "stringVar", "wstringVar" };
-            string[] varDataType = { "bool", "short", "float", "string", "wstring" };
-            string[] startAddress = { "0", "0", "0", "0", "0" };
-            string[] length = { "1", "1", "2", "10", "10" };
+            string[] varName = { "boolVar", "shortVar", "floatVar", "stringVar", "wstringVar", "shortVar2" };
+            string[] varDataType = { "bool", "short", "float", "string", "wstring", "short" };
+            string[] startAddress = { "300", "301", "302", "304", "0", "0" };
+            string[] length = { "1", "1", "2", "10", "10", "" };
 
             DataTable dt = new();
             for (int i = 0; i < headers.Length; i++)
