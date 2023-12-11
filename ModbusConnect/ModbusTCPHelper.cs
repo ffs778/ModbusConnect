@@ -31,6 +31,7 @@ namespace ModbusConnect
             IP = ip;
             Port = port;
             SlaveAddress = slaveAddress;
+            Connect();
             OnDisConnecting += ModbusTCPHelper_OnDisConnecting;
             Task.Factory.StartNew(() => { MonitorPLCHeart(); }, TaskCreationOptions.LongRunning);
             Task.Factory.StartNew(() => { SendPCHeart(); }, TaskCreationOptions.LongRunning);

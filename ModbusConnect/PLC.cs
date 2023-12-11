@@ -10,7 +10,7 @@ namespace ModbusConnect
     {
         #region 事件
         // 外部
-        public static event EventHandler<AppendTextEventArgs> OnAdsNotificationMsg; // 消息通知给外部 
+        //public static event EventHandler<AppendTextEventArgs> OnAdsNotificationMsg; // 消息通知给外部 
         #endregion
 
         #region 公开属性

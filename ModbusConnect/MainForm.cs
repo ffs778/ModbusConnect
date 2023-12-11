@@ -72,9 +72,9 @@ namespace ModbusConnect
                 switch (plcType_cbx.Text)
                 {
                     case "Beckhoff":
-                        _plc = PLCFactory.ConnectBeckhoffPLC(ip_tbx.Text, int.Parse(port_tbx.Text)); break;
+                        _plc = PLCFactory.ConnectBeckhoffPLC(ip_cbx.Text, int.Parse(port_tbx.Text)); break;
                     case "Inovance":
-                        _plc = PLCFactory.ConnectInovance(ip_tbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text)); break;
+                        _plc = PLCFactory.ConnectInovance(ip_cbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text)); break;
                     default:throw new Exception("plc类型出现错误！");
                 }
             }
