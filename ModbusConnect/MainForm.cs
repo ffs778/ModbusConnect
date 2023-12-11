@@ -15,11 +15,13 @@ namespace ModbusConnect
 {
     public partial class MainForm : Form
     {
-        ModbusTCPHelper _modbusTCP;
+        PLC _plc;
         Dictionary<string, VariableModel> _varDic = new();
         public MainForm()
         {
             InitializeComponent();
+            plcType_cbx.SelectedIndex = 1;
+           
             CreateDataTable();
         }
         #region 初始化数据表
@@ -44,7 +46,7 @@ namespace ModbusConnect
             }
             for (int i = 0; i < varName.Length; i++)
             {
-                VariableModel model = new VariableModel()
+                SiteTypeVarModel model = new()
                 {
                     VariableName = varName[i],
                     DataType = varDataType[i],
@@ -57,7 +59,7 @@ namespace ModbusConnect
                 dt.Rows.Add(dr);
             }
             dataGridView1.DataSource = dt;
-        } 
+        }
         #endregion
 
         #region 连接
@@ -66,17 +68,13 @@ namespace ModbusConnect
         {
             try
             {
-                if (_modbusTCP != null) _modbusTCP.DisConnect();
-                _modbusTCP = new ModbusTCPHelper(ip_tbx.Text, int.Parse(port_tbx.Text));
-                if (_modbusTCP.IsConnected)
+                switch (plcType_cbx.Text)
                 {
-                    connectState_lab.Text = "已连接";
-                    connectState_lab.ForeColor = Color.Green;
-                }
-                else
-                {
-                    connectState_lab.Text = "未连接";
-                    connectState_lab.ForeColor = Color.DarkGray;
+                    case "Beckhoff":
+                        _plc = PLCFactory.ConnectBeckhoffPLC(ip_tbx.Text, int.Parse(port_tbx.Text)); break;
+                    case "Inovance":
+                        _plc = PLCFactory.ConnectInovance(ip_tbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text)); break;
+                    default:throw new Exception("plc类型出现错误！");
                 }
             }
             catch (Exception ex)
@@ -89,12 +87,12 @@ namespace ModbusConnect
         #region 读
         private void GetData_tbx_Click(object sender, EventArgs e)
         {
-            if (_modbusTCP == null || !_modbusTCP.IsConnected) return;
+            if (_plc == null || !_plc.IsConnected) return;
             // 跟据每一行变量的地址信息，从PLC中读取后写入到value列
             DataTable dt = dataGridView1.DataSource as DataTable;
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                VariableModel model = new VariableModel()
+                SiteTypeVarModel model = new SiteTypeVarModel()
                 {
                     VariableName = dt.Rows[i][0].ToString(),
                     DataType = dt.Rows[i][1].ToString(),
@@ -103,11 +101,10 @@ namespace ModbusConnect
                 };
                 _varDic[model.VariableName] = model;
             }
-            _modbusTCP.GetData(ref _varDic);
-            var datas = _varDic.Values.ToArray();
+            var keys = _varDic.Keys.ToArray();
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                dt.Rows[i][4] = datas[i].Value;
+                dt.Rows[i][4] = _plc.Read(_varDic[keys[i]]);
             }
             dataGridView1.DataSource = dt;
         }
@@ -117,12 +114,12 @@ namespace ModbusConnect
 
         private void Wirte_btn_Click(object sender, EventArgs e)
         {
-            if (_modbusTCP == null || !_modbusTCP.IsConnected) return;
+            if (_plc == null || !_plc.IsConnected) return;
             // 根据每个变量的信息，将value列的值写入到PLC中。
             DataTable dt = dataGridView1.DataSource as DataTable;
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                VariableModel model = new VariableModel()
+                SiteTypeVarModel model = new SiteTypeVarModel()
                 {
                     VariableName = dt.Rows[i][0].ToString(),
                     DataType = dt.Rows[i][1].ToString(),
@@ -130,9 +127,9 @@ namespace ModbusConnect
                     Length = dt.Rows[i][3].ToString(),
                     Value = dt.Rows[i][4].ToString()
                 };
-                _modbusTCP.WriteData(model, GetDataByType(model.DataType, model.Value)) ;
+                _plc.Write(model, GetDataByType(model.DataType, model.Value));
             }
-        } 
+        }
         private dynamic GetDataByType(string dataType, string value)
         {
             switch (dataType)
@@ -146,5 +143,21 @@ namespace ModbusConnect
             }
         }
         #endregion
+
+        private void timer1_Tick(object sender, EventArgs e)
+        {
+            // 始终判断PLC连接状态
+            if (_plc == null) return;
+            if (_plc.IsConnected)
+            {
+                connectState_lab.Text = "已连接";
+                connectState_lab.ForeColor = Color.Green;
+            }
+            else
+            {
+                connectState_lab.Text = "未连接";
+                connectState_lab.ForeColor = Color.DarkGray;
+            }
+        }
     }
 }
