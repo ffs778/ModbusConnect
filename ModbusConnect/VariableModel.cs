@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace PLCConnect
 {
-    public class VariableModel
+    public abstract class VariableModel
     {
         public string VariableName { get; set; }
         public string DataType { get; set; }
