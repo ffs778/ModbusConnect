@@ -26,6 +26,7 @@ namespace PLCConnect
 
             dt = PLC_VariableDAL.GetData();
             dataGridView1.DataSource = dt;
+            dataGridView2.DataSource = dt;
         }
         #region 连接
 
@@ -56,8 +57,14 @@ namespace PLCConnect
         private void GetData_tbx_Click(object sender, EventArgs e)
         {
             if (_plc == null || !_plc.IsConnected) return;
+            dataGridView1.DataSource = GetRefreshData();
+            dataGridView2.DataSource = GetRefreshData();
+        }
+        public DataTable GetRefreshData()
+        {
             // 跟据每一行变量的地址信息，从PLC中读取后写入到value列
-            DataTable dt = dataGridView1.DataSource as DataTable;
+            DataTable dtSrc = dataGridView1.DataSource as DataTable;
+            DataTable dt = dtSrc.Copy();
             for (int i = 0; i < dt.Rows.Count; i++)
             {
                 SiteTypeVarModel model = new SiteTypeVarModel()
@@ -81,9 +88,8 @@ namespace PLCConnect
                 {
                     dt.Rows[i]["Value"] = temp;
                 }
-
             }
-            dataGridView1.DataSource = dt;
+            return dt;
         }
         #endregion
 
@@ -138,9 +144,10 @@ namespace PLCConnect
                 connectState_lab.Text = "未连接";
                 connectState_lab.ForeColor = Color.DarkGray;
             }
+
+            // 始终读取
+            dataGridView2.DataSource = GetRefreshData();
         }
-
-
         #region 初始化数据表
 
         /// <summary>
