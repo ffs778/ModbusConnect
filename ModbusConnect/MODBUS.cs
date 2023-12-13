@@ -82,15 +82,16 @@ namespace PLCConnect
 
             return dest;
         }
-        //public static void SetReal(ushort[] src, int start, float value)
-        //{
-        //    byte[] bytes = BitConverter.GetBytes(value);
-
-        //    ushort[] dest = Bytes2Ushorts(bytes);
-
-        //    dest.CopyTo(src, start);
-        //}
-
+        public static ushort[] SetReals(float[] values)
+        {
+            ushort[] temp = Array.Empty<ushort>();
+            for (int i = 0; i < values.Length; i++)
+            {
+                temp = temp.Concat(SetReal(values[i])).ToArray();
+            }
+            return temp;
+        }
+       
         /// <summary>
         /// 获取float类型数据
         /// </summary>
@@ -102,24 +103,16 @@ namespace PLCConnect
             float res = BitConverter.ToSingle(bytesTemp, 0);
             return res;
         }
-        /// <summary>
-        /// 获取float类型数据
-        /// </summary>
-        /// <param name="src"></param>
-        /// <param name="start"></param>
-        /// <returns></returns>
-        public static float GetReal(ushort[] src, int start)
+        public static float[] GetReals(ushort[] src)
         {
-            ushort[] temp = new ushort[2];
-            for (int i = 0; i < 2; i++)
+            List<float> floatList = new List<float>(src.Length / 2);
+            for (int i = 0; i < src.Length; i += 2)
             {
-                temp[i] = src[i + start];
+                var currentUshort = src.Skip(i).Take(2).ToArray();
+                floatList.Add(GetReal(currentUshort));
             }
-            byte[] bytesTemp = Ushorts2Bytes(temp);
-            float res = BitConverter.ToSingle(bytesTemp, 0);
-            return res;
+            return floatList.ToArray();
         }
-
         #endregion
 
         #region 读写short
@@ -135,14 +128,15 @@ namespace PLCConnect
             ushort[] dest = Bytes2Ushorts(bytes);
             return dest;
         }
-        //public static void SetShort(ushort[] src, int start, short value)
-        //{
-        //    byte[] bytes = BitConverter.GetBytes(value);
-
-        //    ushort[] dest = Bytes2Ushorts(bytes);
-
-        //    dest.CopyTo(src, start);
-        //}
+        public static ushort[] SetShorts(short[] values)
+        {
+            ushort[] temp = Array.Empty<ushort>();
+            for (int i = 0; i < values.Length; i++)
+            {
+                temp = temp.Concat(SetShort(values[i])).ToArray();
+            }
+            return temp;
+        }
 
         /// <summary>
         /// 获取short类型数据
@@ -150,19 +144,20 @@ namespace PLCConnect
         /// <param name="src"></param>
         /// <param name="start"></param>
         /// <returns></returns>
-        public static short GetShort(ushort[] src)
+        public static short GetShort(params ushort[] src)
         {
             byte[] bytesTemp = Ushorts2Bytes(src);
             short res = BitConverter.ToInt16(bytesTemp, 0);
             return res;
         }
-        public static short GetShort(ushort[] src, int start)
+        public static short[] GetShorts(ushort[] src)
         {
-            ushort[] temp = new ushort[1];
-            temp[0] = src[start];
-            byte[] bytesTemp = Ushorts2Bytes(temp);
-            short res = BitConverter.ToInt16(bytesTemp, 0);
-            return res;
+            List<short> shortList = new List<short>(src.Length);
+            for (int i = 0; i < src.Length; i++)
+            {
+                shortList.Add(GetShort(src[i]));
+            }
+            return shortList.ToArray();
         }
         #endregion
 
@@ -174,32 +169,36 @@ namespace PLCConnect
             ushort[] dest = Bytes2Ushorts(bytes);
             return dest;
         }
+        public static ushort[] SetBools(bool[] values)
+        {
+            ushort[] temp = Array.Empty<ushort>();
+            for (int i = 0; i < values.Length; i++)
+            {
+                temp = temp.Concat(SetBool(values[i])).ToArray();
+            }
+            return temp;
+        }
 
-        // ushort类型数据，16位 ， bool 类型8位   ， 地址中输入1
-        public static bool GetBool(ushort[] src)
+        public static bool GetBool(params ushort[] src)
         {
             byte[] bytes = Ushorts2Bytes(src);  // 从16位到8位，后8位的数据是无效的。
             List<bool> data = new List<bool>(src.Length);
             bool[] res = Byte2Bool(bytes);
             for (int i = 0; i < src.Length; i++)
             {
-                if (i%2 == 0) data.Add(res[i]);
+                if (i % 2 == 0) data.Add(res[i]);
             }
             return data.ToArray()[0];
         }
-        //public static bool[] GetBools(ushort[] src, int start, int num)
-        //{
-        //    ushort[] temp = new ushort[num];
-        //    for (int i = start; i < start + num; i++)
-        //    {
-        //        temp[i] = src[i + start];
-        //    }
-        //    byte[] bytes = Ushorts2Bytes(temp);
-
-        //    bool[] res = Bytes2Bools(bytes);
-
-        //    return res;
-        //}
+        public static bool[] GetBools(ushort[] src)
+        {
+            List<bool> boolList = new List<bool>(src.Length);
+            for (int i = 0; i < src.Length; i++)
+            {
+                boolList.Add(GetBool(src[i]));
+            }
+            return boolList.ToArray();
+        }
         #endregion
 
         #region byte 和 bool互转

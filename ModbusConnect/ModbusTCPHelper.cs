@@ -139,15 +139,18 @@ namespace PLCConnect
 
         #region 读写变量
 
-        public override void Write(VariableModel model, object value)
+        public override void Write(VariableModel model, dynamic value)
         {
             var varModel = model as SiteTypeVarModel;
             ushort[] buff = null;
             switch (varModel.DataType)
             {
-                case "bool": buff = MODBUS.SetBool(Convert.ToBoolean(value)); break;
-                case "short": buff = MODBUS.SetShort(Convert.ToInt16(value)); break;
-                case "float": buff = MODBUS.SetReal(Convert.ToSingle(value)); break;
+                case "bool": buff = MODBUS.SetBool(value); break;
+                case "bool[]":buff = MODBUS.SetBools(value);break;
+                case "short": buff = MODBUS.SetShort(value); break;
+                case "short[]": buff = MODBUS.SetShorts(value); break;
+                case "float": buff = MODBUS.SetReal(value); break;
+                case "float[]": buff = MODBUS.SetReals(value); break;
                 case "string":
                     ushort stringLength = Convert.ToUInt16(varModel.Length);
                     buff = MODBUS.SetString(stringLength, Convert.ToString(value)); break;
@@ -170,20 +173,22 @@ namespace PLCConnect
         /// 读取保持寄存器中的数据
         /// 保持寄存器是字寄存器（16位）
         /// </summary>
-        private string ReadHoldingRegister(ushort startAddresss, string dataType, ushort num)
+        private dynamic ReadHoldingRegister(ushort startAddresss, string dataType, ushort num)
         {
             ushort[] buff = _master.ReadHoldingRegisters(SlaveAddress, startAddresss, num);
             switch (dataType)
             {
-                case "bool": return MODBUS.GetBool(buff).ToString();
-                case "short": return MODBUS.GetShort(buff).ToString();
-                case "float": return MODBUS.GetReal(buff).ToString();
-                case "string": return MODBUS.GetString(buff); // string类型的长度
+                case "bool": return MODBUS.GetBool(buff);
+                case "bool[]":return MODBUS.GetBools(buff);
+                case "short": return MODBUS.GetShort(buff);
+                case "short[]":return MODBUS.GetShorts(buff);
+                case "float": return MODBUS.GetReal(buff);
+                case "float[]":return MODBUS.GetReals(buff);
+                case "string": return MODBUS.GetString(buff); // string类型的长度 ， 如果是string数组类型，还需要传string长度。暂未添加string[]读取
                 case "wstring": return MODBUS.GetWString(buff);// wstring 类型的长度
                 default: return null;
             }
         }
-
         #endregion
 
         public override void DataTableToDic(DataTable dbDataTable)

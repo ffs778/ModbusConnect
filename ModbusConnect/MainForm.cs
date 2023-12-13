@@ -41,8 +41,8 @@ namespace PLCConnect
                     case "Inovance":
                         _plc = pLCFactory.ConnectInovance(ip_cbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text));
                         break;
-                       
-                    default:throw new Exception("plc类型出现错误！");
+
+                    default: throw new Exception("plc类型出现错误！");
                 }
             }
             catch (Exception ex)
@@ -72,7 +72,16 @@ namespace PLCConnect
             var keys = _varDic.Keys.ToArray();
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                dt.Rows[i]["Value"] = _plc.Read(_varDic[keys[i]]);
+                var temp = _plc.Read(_varDic[keys[i]]);
+                if (_varDic[keys[i]].DataType.Contains("[]"))
+                {
+                    dt.Rows[i]["Value"] = string.Join(',', temp);
+                }
+                else
+                {
+                    dt.Rows[i]["Value"] = temp;
+                }
+
             }
             dataGridView1.DataSource = dt;
         }
@@ -103,8 +112,11 @@ namespace PLCConnect
             switch (dataType)
             {
                 case "bool": return Convert.ToBoolean(value);
+                case "bool[]": return value.Split(',').Select(x => Convert.ToBoolean(x)).ToArray();
                 case "short": return Convert.ToInt16(value);
+                case "short[]": return value.Split(',').Select(x => Convert.ToInt16(x)).ToArray();
                 case "float": return Convert.ToSingle(value);
+                case "float[]": return value.Split(',').Select(x => Convert.ToSingle(x)).ToArray();
                 case "string": return value;
                 case "wstring": return value;
                 default: return null;
@@ -180,7 +192,7 @@ namespace PLCConnect
                 _plc.IsShieldPLCHeart = false;
                 plcHeartShield_btn.Text = "屏蔽PLC心跳";
             }
-            
+
         }
     }
 }

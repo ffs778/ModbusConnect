@@ -37,7 +37,7 @@ namespace PLCConnect
         /// </summary>
         /// <param name="model"></param>
         /// <param name="value"></param>
-        public abstract void Write(VariableModel model, object value);
+        public abstract void Write(VariableModel model, dynamic value);
         /// <summary>
         /// 读变量
         /// </summary>
