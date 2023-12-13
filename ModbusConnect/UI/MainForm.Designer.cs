@@ -302,7 +302,7 @@ namespace PLCConnect
             this.plcHeartShield_btn.Name = "plcHeartShield_btn";
             this.plcHeartShield_btn.Size = new System.Drawing.Size(94, 25);
             this.plcHeartShield_btn.Text = "屏蔽PLC心跳";
-            this.plcHeartShield_btn.Click += new System.EventHandler(this.plcHeartShield_btn_Click);
+            this.plcHeartShield_btn.Click += new System.EventHandler(this.PlcHeartShield_btn_Click);
             // 
             // toolStripSeparator8
             // 
@@ -347,7 +347,7 @@ namespace PLCConnect
             // timer1
             // 
             this.timer1.Enabled = true;
-            this.timer1.Tick += new System.EventHandler(this.timer1_Tick);
+            this.timer1.Tick += new System.EventHandler(this.Timer1_Tick);
             // 
             // groupBox2
             // 

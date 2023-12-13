@@ -17,18 +17,17 @@ namespace PLCConnect
     {
         DataTable dt;
         PLC _plc;
-        Dictionary<string, VariableModel> _varDic = new();
         public MainForm()
         {
             InitializeComponent();
             plcType_cbx.SelectedIndex = 1;
             ip_cbx.SelectedIndex = 0;
 
-            dt = PLC_VariableDAL.GetData();
+            dt = PLC_VariableDAL.GetData();// 读取变量表
             dataGridView1.DataSource = dt;
             dataGridView2.DataSource = dt;
         }
-        #region 连接
+        #region 初始化连接PLC
 
         private void Connect_btn_Click(object sender, EventArgs e)
         {
@@ -53,7 +52,7 @@ namespace PLCConnect
         }
         #endregion
 
-        #region 读
+        #region 测试读
         private void GetData_tbx_Click(object sender, EventArgs e)
         {
             if (_plc == null || !_plc.IsConnected) return;
@@ -67,38 +66,20 @@ namespace PLCConnect
             DataTable dt = dtSrc.Copy();
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                SiteTypeVarModel model = new SiteTypeVarModel()
-                {
-                    VariableName = dt.Rows[i]["VariableName"].ToString(),
-                    DataType = dt.Rows[i]["DataType"].ToString(),
-                    StartAddress = dt.Rows[i]["StartAddress"].ToString(),
-                    Length = dt.Rows[i]["Length"].ToString(),
-                };
-                _varDic[model.VariableName] = model;
-            }
-            var keys = _varDic.Keys.ToArray();
-            for (int i = 0; i < dt.Rows.Count; i++)
-            {
-                var temp = _plc.Read(keys[i]);
-                if (_varDic[keys[i]].DataType.Contains("[]"))
-                {
-                    dt.Rows[i]["Value"] = string.Join(',', temp);
-                }
-                else
-                {
-                    dt.Rows[i]["Value"] = temp;
-                }
+                string variableName = dt.Rows[i]["VariableName"].ToString();
+                string dataType = dt.Rows[i]["DataType"].ToString();
+                var value = _plc.Read(variableName);
+                dt.Rows[i]["Value"] = dataType.Contains("[]") ? string.Join(',', value) : value;
             }
             return dt;
         }
         #endregion
 
-        #region 写
+        #region 测试写
 
         private void Wirte_btn_Click(object sender, EventArgs e)
         {
             if (_plc == null || !_plc.IsConnected) return;
-            // 根据每个变量的信息，将value列的值写入到PLC中。
             DataTable dt = dataGridView1.DataSource as DataTable;
             for (int i = 0; i < dt.Rows.Count; i++)
             {
@@ -107,7 +88,7 @@ namespace PLCConnect
                 _plc.Write(dt.Rows[i]["VariableName"].ToString(), GetDataByType(dataType, value));
             }
         }
-        private dynamic GetDataByType(string dataType, string value)
+        private static dynamic GetDataByType(string dataType, string value)
         {
             switch (dataType)
             {
@@ -124,7 +105,9 @@ namespace PLCConnect
         }
         #endregion
 
-        private void timer1_Tick(object sender, EventArgs e)
+        #region 定时器
+
+        private void Timer1_Tick(object sender, EventArgs e)
         {
             // 始终判断PLC连接状态
             if (_plc == null) return;
@@ -132,17 +115,21 @@ namespace PLCConnect
             {
                 connectState_lab.Text = "已连接";
                 connectState_lab.ForeColor = Color.Green;
+
+                // 始终读取
+                dataGridView2.DataSource = GetRefreshData();
             }
             else
             {
                 connectState_lab.Text = "未连接";
                 connectState_lab.ForeColor = Color.DarkGray;
             }
-
-            // 始终读取
-            dataGridView2.DataSource = GetRefreshData();
         }
-        private void plcHeartShield_btn_Click(object sender, EventArgs e)
+        #endregion
+
+        #region 心跳屏蔽
+
+        private void PlcHeartShield_btn_Click(object sender, EventArgs e)
         {
             if (_plc == null) return;
             if (plcHeartShield_btn.Text == "屏蔽PLC心跳")
@@ -155,7 +142,7 @@ namespace PLCConnect
                 _plc.IsShieldPLCHeart = false;
                 plcHeartShield_btn.Text = "屏蔽PLC心跳";
             }
-
-        }
+        } 
+        #endregion
     }
 }
