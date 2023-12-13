@@ -37,15 +37,26 @@ namespace PLCConnect
         /// </summary>
         /// <param name="model"></param>
         /// <param name="value"></param>
-        public abstract void Write(VariableModel model, dynamic value);
+        public abstract void Write(string variableName, dynamic value);
         /// <summary>
         /// 读变量
         /// </summary>
-        /// <param name="model"></param>
+        /// <param name="variableName"></param>
         /// <returns></returns>
-        public abstract dynamic Read(VariableModel model);
+        public abstract dynamic Read(string variableName);
+        /// <summary>
+        /// 监控PLC心跳
+        /// </summary>
         public abstract void MonitorPLCHeart();
+        /// <summary>
+        /// 发送PC心跳
+        /// </summary>
         public abstract void SendPCHeart();
-        public abstract void DataTableToDic(DataTable dbDataTable);
+        /// <summary>
+        /// 初始化变量字典
+        /// 获得所有变量的基本信息
+        /// </summary>
+        /// <param name="dbDataTable"></param>
+        public abstract void InitialDataDic(DataTable dbDataTable);
     }
 }

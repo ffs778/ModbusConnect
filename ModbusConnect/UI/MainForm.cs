@@ -79,7 +79,7 @@ namespace PLCConnect
             var keys = _varDic.Keys.ToArray();
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                var temp = _plc.Read(_varDic[keys[i]]);
+                var temp = _plc.Read(keys[i]);
                 if (_varDic[keys[i]].DataType.Contains("[]"))
                 {
                     dt.Rows[i]["Value"] = string.Join(',', temp);
@@ -102,15 +102,9 @@ namespace PLCConnect
             DataTable dt = dataGridView1.DataSource as DataTable;
             for (int i = 0; i < dt.Rows.Count; i++)
             {
-                SiteTypeVarModel model = new SiteTypeVarModel()
-                {
-                    VariableName = dt.Rows[i]["VariableName"].ToString(),
-                    DataType = dt.Rows[i]["DataType"].ToString(),
-                    StartAddress = dt.Rows[i]["StartAddress"].ToString(),
-                    Length = dt.Rows[i]["Length"].ToString(),
-                    Value = dt.Rows[i]["Value"].ToString()
-                };
-                _plc.Write(model, GetDataByType(model.DataType, model.Value));
+                string dataType = dt.Rows[i]["DataType"].ToString();
+                string value = dt.Rows[i]["Value"].ToString();
+                _plc.Write(dt.Rows[i]["VariableName"].ToString(), GetDataByType(dataType, value));
             }
         }
         private dynamic GetDataByType(string dataType, string value)
@@ -148,44 +142,6 @@ namespace PLCConnect
             // 始终读取
             dataGridView2.DataSource = GetRefreshData();
         }
-        #region 初始化数据表
-
-        /// <summary>
-        /// 模拟变量表
-        /// </summary>
-        private void CreateDataTable()
-        {
-            string[] headers = { "变量名", "数据类型", "起始地址", "数据长度", "当前值" };
-            string[] varName = { "boolVar", "shortVar", "floatVar", "stringVar", "wstringVar", "shortVar2" };
-            string[] varDataType = { "bool", "short", "float", "string", "wstring", "short" };
-            string[] startAddress = { "300", "301", "302", "304", "0", "0" };
-            string[] length = { "1", "1", "2", "10", "10", "" };
-
-            DataTable dt = new();
-            for (int i = 0; i < headers.Length; i++)
-            {
-                DataColumn dc = new DataColumn();
-                dc.ColumnName = headers[i];
-                dt.Columns.Add(dc);
-            }
-            for (int i = 0; i < varName.Length; i++)
-            {
-                SiteTypeVarModel model = new()
-                {
-                    VariableName = varName[i],
-                    DataType = varDataType[i],
-                    StartAddress = startAddress[i],
-                    Length = length[i]
-                };
-
-                DataRow dr = dt.NewRow();
-                dr.ItemArray = new object[] { model.VariableName, model.DataType, model.StartAddress, model.Length };
-                dt.Rows.Add(dr);
-            }
-            dataGridView1.DataSource = dt;
-        }
-        #endregion
-
         private void plcHeartShield_btn_Click(object sender, EventArgs e)
         {
             if (_plc == null) return;

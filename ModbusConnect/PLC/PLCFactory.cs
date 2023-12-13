@@ -26,7 +26,7 @@ namespace PLCConnect
         public PLC ConnectInovance(string ip ,int port = 502,byte address = 1)
         {
             var plc = new ModbusTCPHelper(ip, port,address);
-            plc.DataTableToDic(_variableDt);
+            plc.InitialDataDic(_variableDt);
             //plc.MonitorPLCHeart();
             //plc.SendPCHeart();
             return plc;

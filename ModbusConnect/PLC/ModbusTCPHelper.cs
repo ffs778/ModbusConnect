@@ -83,7 +83,8 @@ namespace PLCConnect
                             // 监控PLC心跳，如果脉冲长时间不变化，则说明断线
                             if (heartLst.Count <= 5)
                             {
-                                heartLst.Add(DataDic["PLCHeart"].Value);
+                                var heart = Read("PLCHeart");
+                                heartLst.Add(heart);
                             }
                             else
                             {
@@ -125,7 +126,7 @@ namespace PLCConnect
                 {
                     while (true)
                     {
-                        Write(DataDic["PCHeart"], !heart);
+                        Write("PCHeart", !heart);
                         Thread.Sleep(1000);
                     }
                 }
@@ -139,8 +140,9 @@ namespace PLCConnect
 
         #region 读写变量
 
-        public override void Write(VariableModel model, dynamic value)
+        public override void Write(string variableName, dynamic value)
         {
+            var model = DataDic[variableName];
             var varModel = model as SiteTypeVarModel;
             ushort[] buff = null;
             switch (varModel.DataType)
@@ -162,8 +164,9 @@ namespace PLCConnect
             _master.WriteMultipleRegisters(SlaveAddress, startAddress, buff);  // 最多写123个寄存器，即256字节
         }
 
-        public override dynamic Read(VariableModel model)
+        public override dynamic Read(string variableName)
         {
+            var model = DataDic[variableName];
             var varModel = model as SiteTypeVarModel;
             ushort startAddress = Convert.ToUInt16(varModel.StartAddress);
             ushort length = Convert.ToUInt16(varModel.Length);
@@ -191,7 +194,7 @@ namespace PLCConnect
         }
         #endregion
 
-        public override void DataTableToDic(DataTable dbDataTable)
+        public override void InitialDataDic(DataTable dbDataTable)
         {
             for (int i = 0; i < dbDataTable.Rows.Count; i++)
             {
