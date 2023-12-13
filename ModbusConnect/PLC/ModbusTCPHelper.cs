@@ -142,8 +142,7 @@ namespace PLCConnect
 
         public override void Write(string variableName, dynamic value)
         {
-            var model = DataDic[variableName];
-            var varModel = model as SiteTypeVarModel;
+            var varModel = DataDic[variableName];
             ushort[] buff = null;
             switch (varModel.DataType)
             {
@@ -166,8 +165,7 @@ namespace PLCConnect
 
         public override dynamic Read(string variableName)
         {
-            var model = DataDic[variableName];
-            var varModel = model as SiteTypeVarModel;
+            var varModel = DataDic[variableName];
             ushort startAddress = Convert.ToUInt16(varModel.StartAddress);
             ushort length = Convert.ToUInt16(varModel.Length);
             return ReadHoldingRegister(startAddress, varModel.DataType, length);
