@@ -56,11 +56,6 @@ namespace PLCConnect
             this.toolStripLabel4 = new System.Windows.Forms.ToolStripLabel();
             this.connectState_lab = new System.Windows.Forms.ToolStripLabel();
             this.toolStripSeparator4 = new System.Windows.Forms.ToolStripSeparator();
-            this.toolStripLabel6 = new System.Windows.Forms.ToolStripLabel();
-            this.connectType_lab = new System.Windows.Forms.ToolStripLabel();
-            this.toolStripSeparator7 = new System.Windows.Forms.ToolStripSeparator();
-            this.plcHeartShield_btn = new System.Windows.Forms.ToolStripButton();
-            this.toolStripSeparator8 = new System.Windows.Forms.ToolStripSeparator();
             this.toolStripLabel5 = new System.Windows.Forms.ToolStripLabel();
             this.read_btn = new System.Windows.Forms.ToolStripButton();
             this.toolStripSeparator5 = new System.Windows.Forms.ToolStripSeparator();
@@ -103,7 +98,7 @@ namespace PLCConnect
             this.dataGridView1.RowHeadersVisible = false;
             this.dataGridView1.RowHeadersWidth = 51;
             this.dataGridView1.RowTemplate.Height = 25;
-            this.dataGridView1.Size = new System.Drawing.Size(1393, 355);
+            this.dataGridView1.Size = new System.Drawing.Size(1184, 355);
             this.dataGridView1.TabIndex = 26;
             // 
             // groupBox1
@@ -113,7 +108,7 @@ namespace PLCConnect
             this.groupBox1.Location = new System.Drawing.Point(0, 0);
             this.groupBox1.Name = "groupBox1";
             this.groupBox1.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.groupBox1.Size = new System.Drawing.Size(1397, 377);
+            this.groupBox1.Size = new System.Drawing.Size(1188, 377);
             this.groupBox1.TabIndex = 27;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "模拟变量表_读写";
@@ -140,18 +135,13 @@ namespace PLCConnect
             this.toolStripLabel4,
             this.connectState_lab,
             this.toolStripSeparator4,
-            this.toolStripLabel6,
-            this.connectType_lab,
-            this.toolStripSeparator7,
-            this.plcHeartShield_btn,
-            this.toolStripSeparator8,
             this.toolStripLabel5,
             this.read_btn,
             this.toolStripSeparator5,
             this.wirte_btn});
             this.toolStrip1.Location = new System.Drawing.Point(0, 757);
             this.toolStrip1.Name = "toolStrip1";
-            this.toolStrip1.Size = new System.Drawing.Size(1397, 28);
+            this.toolStrip1.Size = new System.Drawing.Size(1188, 28);
             this.toolStrip1.TabIndex = 28;
             this.toolStrip1.Text = "toolStrip1";
             // 
@@ -270,45 +260,6 @@ namespace PLCConnect
             this.toolStripSeparator4.Name = "toolStripSeparator4";
             this.toolStripSeparator4.Size = new System.Drawing.Size(6, 28);
             // 
-            // toolStripLabel6
-            // 
-            this.toolStripLabel6.Name = "toolStripLabel6";
-            this.toolStripLabel6.Size = new System.Drawing.Size(79, 25);
-            this.toolStripLabel6.Text = "连接模式：";
-            // 
-            // connectType_lab
-            // 
-            this.connectType_lab.AutoSize = false;
-            this.connectType_lab.BackColor = System.Drawing.Color.White;
-            this.connectType_lab.BackgroundImageLayout = System.Windows.Forms.ImageLayout.None;
-            this.connectType_lab.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.connectType_lab.ForeColor = System.Drawing.SystemColors.Highlight;
-            this.connectType_lab.Name = "connectType_lab";
-            this.connectType_lab.Size = new System.Drawing.Size(37, 25);
-            this.connectType_lab.Text = "正常";
-            // 
-            // toolStripSeparator7
-            // 
-            this.toolStripSeparator7.Name = "toolStripSeparator7";
-            this.toolStripSeparator7.Size = new System.Drawing.Size(6, 28);
-            // 
-            // plcHeartShield_btn
-            // 
-            this.plcHeartShield_btn.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(128)))));
-            this.plcHeartShield_btn.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Text;
-            this.plcHeartShield_btn.ForeColor = System.Drawing.SystemColors.ButtonFace;
-            this.plcHeartShield_btn.Image = ((System.Drawing.Image)(resources.GetObject("plcHeartShield_btn.Image")));
-            this.plcHeartShield_btn.ImageTransparentColor = System.Drawing.Color.Magenta;
-            this.plcHeartShield_btn.Name = "plcHeartShield_btn";
-            this.plcHeartShield_btn.Size = new System.Drawing.Size(94, 25);
-            this.plcHeartShield_btn.Text = "屏蔽PLC心跳";
-            this.plcHeartShield_btn.Click += new System.EventHandler(this.PlcHeartShield_btn_Click);
-            // 
-            // toolStripSeparator8
-            // 
-            this.toolStripSeparator8.Name = "toolStripSeparator8";
-            this.toolStripSeparator8.Size = new System.Drawing.Size(6, 28);
-            // 
             // toolStripLabel5
             // 
             this.toolStripLabel5.AutoSize = false;
@@ -356,7 +307,7 @@ namespace PLCConnect
             this.groupBox2.Location = new System.Drawing.Point(0, 375);
             this.groupBox2.Name = "groupBox2";
             this.groupBox2.Padding = new System.Windows.Forms.Padding(2, 3, 2, 3);
-            this.groupBox2.Size = new System.Drawing.Size(1397, 382);
+            this.groupBox2.Size = new System.Drawing.Size(1188, 382);
             this.groupBox2.TabIndex = 29;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "模拟变量表_持续读";
@@ -389,14 +340,14 @@ namespace PLCConnect
             this.dataGridView2.RowHeadersVisible = false;
             this.dataGridView2.RowHeadersWidth = 51;
             this.dataGridView2.RowTemplate.Height = 25;
-            this.dataGridView2.Size = new System.Drawing.Size(1393, 360);
+            this.dataGridView2.Size = new System.Drawing.Size(1184, 360);
             this.dataGridView2.TabIndex = 26;
             // 
             // MainForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(7F, 17F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(1397, 785);
+            this.ClientSize = new System.Drawing.Size(1188, 785);
             this.Controls.Add(this.groupBox2);
             this.Controls.Add(this.toolStrip1);
             this.Controls.Add(this.groupBox1);
@@ -437,12 +388,7 @@ namespace PLCConnect
         private System.Windows.Forms.ToolStripComboBox plcType_cbx;
         private System.Windows.Forms.Timer timer1;
         private System.Windows.Forms.ToolStripComboBox ip_cbx;
-        private System.Windows.Forms.ToolStripLabel toolStripLabel6;
-        private System.Windows.Forms.ToolStripLabel connectType_lab;
         private System.Windows.Forms.ToolStripSeparator toolStripSeparator6;
-        private System.Windows.Forms.ToolStripButton plcHeartShield_btn;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator7;
-        private System.Windows.Forms.ToolStripSeparator toolStripSeparator8;
         private System.Windows.Forms.GroupBox groupBox2;
         private System.Windows.Forms.DataGridView dataGridView2;
     }

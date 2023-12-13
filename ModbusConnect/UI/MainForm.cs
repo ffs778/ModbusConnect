@@ -127,22 +127,5 @@ namespace PLCConnect
         }
         #endregion
 
-        #region 心跳屏蔽
-
-        private void PlcHeartShield_btn_Click(object sender, EventArgs e)
-        {
-            if (_plc == null) return;
-            if (plcHeartShield_btn.Text == "屏蔽PLC心跳")
-            {
-                _plc.IsShieldPLCHeart = true;
-                plcHeartShield_btn.Text = "取消PLC心跳屏蔽";
-            }
-            else
-            {
-                _plc.IsShieldPLCHeart = false;
-                plcHeartShield_btn.Text = "屏蔽PLC心跳";
-            }
-        } 
-        #endregion
     }
 }
