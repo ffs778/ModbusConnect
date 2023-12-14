@@ -18,6 +18,7 @@ namespace PLCConnect
         private TcpClient _tcpClient;
         #endregion
 
+        public override event EventHandler OnAdsNotificationMsg; // 消息通知给外部 
         #region 事件
         private event EventHandler OnDisConnecting;   // 监控此Ads对象是否处于未连接状态执行重连逻辑。
         #endregion
@@ -32,7 +33,6 @@ namespace PLCConnect
             IP = ip;
             Port = port;
             SlaveAddress = slaveAddress;
-            Connect();
             OnDisConnecting += ModbusTCPHelper_OnDisConnecting;
         }
         public override void Connect()
@@ -93,6 +93,7 @@ namespace PLCConnect
                                     // list中只有一种bool类型，即心跳断开
                                     IsConnected = false;
                                     //  OnDisConnecting.Invoke(true, EventArgs.Empty);   // 表示捕捉到ads通讯未连接，执行事件
+                                    OnAdsNotificationMsg?.Invoke(null, EventArgs.Empty);
                                 }
                                 else
                                 {

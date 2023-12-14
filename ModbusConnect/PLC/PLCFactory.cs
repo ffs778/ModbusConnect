@@ -23,7 +23,7 @@ namespace PLCConnect
         {
             return null;
         }
-        public PLC ConnectInovance(string ip ,int port = 502,byte address = 1)
+        public PLC CreateInovance(string ip ,int port = 502,byte address = 1)
         {
             var plc = new ModbusTCPHelper(ip, port,address);
             plc.InitialDataDic(_variableDt);

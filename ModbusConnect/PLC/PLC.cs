@@ -11,7 +11,7 @@ namespace PLCConnect
     {
         #region 事件
         // 外部
-        //public static event EventHandler<AppendTextEventArgs> OnAdsNotificationMsg; // 消息通知给外部 
+        public abstract event EventHandler OnAdsNotificationMsg; // 消息通知给外部 
         #endregion
 
         #region 公开属性
@@ -58,5 +58,9 @@ namespace PLCConnect
         /// </summary>
         /// <param name="dbDataTable"></param>
         public abstract void InitialDataDic(DataTable dbDataTable);
+    }
+    interface IEvent
+    {
+        public static event EventHandler OnAdsNotificationMsg; // 消息通知给外部 
     }
 }

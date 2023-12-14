@@ -23,9 +23,15 @@ namespace PLCConnect
             plcType_cbx.SelectedIndex = 1;
             ip_cbx.SelectedIndex = 0;
 
+           
             dt = PLC_VariableDAL.GetData();// 读取变量表
             dataGridView1.DataSource = dt;
             dataGridView2.DataSource = dt;
+        }
+
+        private void _plc_OnAdsNotificationMsg1(object sender, EventArgs e)
+        {
+            MessageBox.Show(sender.ToString());
         }
         #region 初始化连接PLC
 
@@ -39,7 +45,9 @@ namespace PLCConnect
                     case "Beckhoff":
                         _plc = pLCFactory.ConnectBeckhoffPLC(ip_cbx.Text, int.Parse(port_tbx.Text)); break;
                     case "Inovance":
-                        _plc = pLCFactory.ConnectInovance(ip_cbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text));
+                        _plc = pLCFactory.CreateInovance(ip_cbx.Text, int.Parse(port_tbx.Text), byte.Parse(slaveAddress_tbx.Text));
+                        _plc.Connect();
+                        _plc.OnAdsNotificationMsg += _plc_OnAdsNotificationMsg1;
                         break;
 
                     default: throw new Exception("plc类型出现错误！");
